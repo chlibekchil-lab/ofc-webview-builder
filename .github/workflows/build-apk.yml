@@ -29,8 +29,8 @@ jobs:
 
       - name: Isi nama app & URL target
         run: |
-          sed -i "s#\${APP_NAME}#${{ github.event.inputs.app_name }}#g" app/src/main/res/values/strings.xml
-          sed -i "s#\${TARGET_URL}#${{ github.event.inputs.target_url }}#g" app/src/main/res/values/strings.xml
+          sed -i "s#{{APP_NAME}}#${{ github.event.inputs.app_name }}#g" app/src/main/res/values/strings.xml
+          sed -i "s#{{TARGET_URL}}#${{ github.event.inputs.target_url }}#g" app/src/main/res/values/strings.xml
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
