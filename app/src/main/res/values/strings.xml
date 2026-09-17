@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">{{APP_NAME}}</string>
-    <string name="target_url">{{TARGET_URL}}</string>
+    <string name="app_name">Guardline Companion</string>
+    <string name="device_admin_explanation">Guardline Companion memakai izin ini hanya untuk mengunci layar HP saat orang tua mengaktifkannya dari dashboard. Tidak dipakai untuk menghapus data atau mengubah kata sandi.</string>
+    <string name="accessibility_service_description">Guardline Companion memakai layanan ini hanya untuk dua hal: menutup aplikasi yang ada di daftar blokir orang tua, dan menutup aplikasi saat batas waktu layar harian sudah tercapai. Layanan ini tidak membaca isi layar atau mengetikkan apa pun.</string>
 </resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Daftar kebijakan yang ditanyakan ke sistem Android saat anak menekan
+  "Izinkan" pada layar penjelasan Kunci Layar. Hanya force-lock yang
+  diminta — sengaja tidak minta wipe-data, reset-password, dsb supaya
+  jelas dan minimal.
+-->
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies>
+        <force-lock />
+    </uses-policies>
+</device-admin>

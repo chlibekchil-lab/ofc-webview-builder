@@ -1,56 +1,57 @@
-# Template Android WebView (buat fitur "Buat APK" di Bot Tim OFC)
+# Guardline Companion — project Android
 
-Ini template Android minimal yang cuma nampilin sebuah website di dalam
-WebView — dipakai bot buat "ubah website jadi APK" secara otomatis lewat
-GitHub Actions.
+Ini kerangka project Android Studio untuk apk companion Guardline (sisi HP anak),
+hasil konversi dari prototipe web sebelumnya.
 
-⚠️ **Catatan jujur**: Template ini aku susun berdasarkan pola umum yang
-biasa dipakai (bukan hasil compile beneran, karena aku nggak punya
-environment Android buat nge-test). Kemungkinan besar percobaan pertama
-perlu sedikit debug (misal versi Gradle/Android SDK yang nggak cocok).
-Kalau ada error pas build pertama, screenshot log-nya dari tab **Actions**
-di GitHub, kirim ke chat ini biar aku bantu perbaiki.
+## Cara membuka
+1. Buka Android Studio → **Open** → pilih folder `GuardlineCompanion` ini.
+2. Tunggu Gradle sync selesai (perlu koneksi internet untuk download dependency
+   pertama kali).
+3. Jalankan ke emulator atau HP fisik (Run ▶).
 
-## Cara Setup (Sekali Saja)
+## Prinsip alur izin di seluruh app
+Untuk setiap fitur, urutannya **selalu**:
+1. Kartu penjelasan dulu ("izin ini buat apa") — lihat `PermissionExplainScreen`
+   di `MainActivity.kt`.
+2. Baru setelah anak menekan "Izinkan", dialog izin resmi Android muncul.
+3. Status (aktif/belum) selalu terlihat lagi di `HomeScreen` — tidak ada yang
+   berjalan diam-diam di belakang tanpa status yang terlihat.
 
-1. **Bikin repo baru di GitHub** (boleh private atau public), misal
-   namanya `ofc-webview-builder`
-2. Upload/push semua isi folder ini ke repo itu (termasuk folder
-   `.github/workflows/`)
-3. **Bikin Personal Access Token**:
-   - Buka https://github.com/settings/tokens
-   - "Generate new token" → **classic**
-   - Centang scope: `repo` dan `workflow`
-   - Generate, copy tokennya (cuma muncul sekali!)
-4. Isi di `config.js` bot Node.js kamu:
-   ```js
-   GITHUB_TOKEN: "isi-token-kamu",
-   GITHUB_OWNER: "username-github-kamu",
-   GITHUB_REPO: "ofc-webview-builder",
-   GITHUB_WORKFLOW_FILE: "build-apk.yml",
-   GITHUB_BRANCH: "main",
-   ```
+## Fitur yang sudah diimplementasikan
+- **Kunci layar** — lewat Device Administrator API (`LockController.lockNow()`).
+  Policy yang diminta ke sistem cuma `force-lock`, sengaja tidak minta hak
+  wipe-data atau reset-password.
+- **Sinkron ke dashboard lewat Firebase Realtime Database** (`RealtimeSync.kt`).
+  Companion menulis status (izin apa yang aktif, status terkunci) dan
+  mendengarkan perintah kunci dari dashboard. **WAJIB isi `FirebaseConfig.kt`
+  dengan data project Firebase kamu sendiri** — lihat komentar di file itu.
+- **Foreground service** (`GuardlineForegroundService.kt`) — menjaga koneksi
+  Firebase tetap hidup walau app ditutup, dengan notifikasi permanen yang
+  SELALU terlihat oleh anak (sengaja tidak disembunyikan).
+- **Blokir aplikasi & batas waktu layar** lewat Accessibility Service
+  (`GuardlineAccessibilityService.kt`) — mengaktifkannya lewat dialog
+  penjelasan resmi Android sendiri, membaca daftar blokir & batas waktu dari
+  Firebase (diatur dari dashboard), TIDAK membaca isi layar
+  (`canRetrieveWindowContent="false"`).
 
-## Cara Kerja
+## Yang masih perlu kamu kerjakan
+1. **Isi `FirebaseConfig.kt`** dengan project Firebase kamu sendiri (gratis,
+   lihat instruksi di file itu).
+2. **Sambungkan dashboard web (`guardline-dashboard.html`) ke Firebase project
+   yang sama** agar tombol "Kunci HP sekarang" dan menu blokir aplikasi di
+   dashboard benar-benar menulis ke `devices/{pairCode}/commands` dan
+   `devices/{pairCode}/config`. Catatan: karena dashboard saat ini dipublish
+   sebagai Claude Artifact, Content-Security-Policy artifact TIDAK
+   mengizinkan memuat Firebase JS SDK (domain gstatic.com tidak ada di daftar
+   izin). Supaya Firebase benar-benar jalan di dashboard, dashboard perlu
+   dideploy sebagai website sungguhan (misalnya lewat Netlify/Vercel yang
+   sudah terhubung) — bisa aku bantu proses deploy-nya kalau mau lanjut ke
+   sini.
+3. **Lokasi real-time** — belum ditulis; perlu `FusedLocationProviderClient`
+   + kirim ke `RealtimeSync` (pola penulisannya sama seperti `writeStatus`).
+4. Uji di HP fisik: emulator biasanya tidak mendukung Accessibility Service
+   dan Device Admin dengan baik.
 
-1. User klik "📱 Buat APK" di bot → isi nama app & URL website
-2. Bot manggil GitHub API buat trigger workflow ini
-3. GitHub Actions otomatis: install Android SDK, isi nama app & URL ke
-   `strings.xml`, compile APK
-4. Bot polling tiap 15 detik nunggu build selesai (bisa 3-8 menit)
-5. Kalau sukses, bot download APK-nya dan kirim langsung ke chat
-
-## Kalau Mau Coba Manual Dulu (Tanpa Bot)
-
-Buka tab **Actions** di repo GitHub kamu → pilih workflow "Build APK" →
-"Run workflow" → isi nama app & URL → Run. Tunggu selesai, APK-nya bisa
-didownload dari halaman run tersebut (bagian "Artifacts").
-
-## Batasan
-
-- APK yang dihasilkan itu **APK debug (belum ditandatangani buat rilis
-  ke Play Store)** — cukup buat dipakai sendiri/dibagikan manual, tapi
-  belum bisa diupload ke Google Play (butuh proses signing terpisah)
-- Ini WebView wrapper doang — bukan aplikasi native asli, jadi fiturnya
-  ya sebatas nampilin website (nggak ada notifikasi push, dll kecuali
-  ditambah manual)
+## Tentang icon & tema
+Icon dan tema di sini masih placeholder sederhana (warna hijau + huruf G) —
+ganti sesuai kebutuhan lewat Android Studio > Image Asset Studio.

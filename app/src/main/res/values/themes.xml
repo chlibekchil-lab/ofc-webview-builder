@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.GuardlineCompanion" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
