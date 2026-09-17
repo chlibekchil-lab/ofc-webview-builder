@@ -16,7 +16,7 @@ class GuardlineDeviceAdminReceiver : DeviceAdminReceiver() {
         super.onEnabled(context, intent)
     }
 
-    override fun onDisabled(context: Context) {
-        super.onDisabled(context)
+    override fun onDisabled(context: Context, intent: Intent) {
+        super.onDisabled(context, intent)
     }
 }
